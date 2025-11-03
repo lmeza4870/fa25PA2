@@ -88,7 +88,7 @@ int createLeafNodes(int freq[]) {
 }
 
 // Step 3: Build the encoding tree using heap operations
-int buildEncodingTree(int nextFree) {
+int buildEncodingTree(int nextFree) {   //encoding
     // TODO:
     // 1. Create a MinHeap object.
     // 2. Push all leaf node indices into the heap.
