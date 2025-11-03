@@ -88,26 +88,73 @@ int createLeafNodes(int freq[]) {
 }
 
 // Step 3: Build the encoding tree using heap operations
-int buildEncodingTree(int nextFree) {   //encoding
-    // TODO:
-    // 1. Create a MinHeap object.
-    // 2. Push all leaf node indices into the heap.
-    // 3. While the heap size is greater than 1:
-    //    - Pop two smallest nodes
-    //    - Create a new parent node with combined weight
-    //    - Set left/right pointers
-    //    - Push new parent index back into the heap
-    // 4. Return the index of the last remaining node (root)
+int buildEncodingTree(int nextFree) {
+    if (nextFree == 0) {   //empty
+        return 0;
+    }
+    if (nextFree == 1) {    //only root
+        return 0;
+    }
+    MinHeap heap;
+
+    // 1) Push all leaf indices into the heap
+    for (int i = 0; i < nextFree; ++i) {
+        heap.push(i, weightArr);
+    }
+    while (heap.size > 1) {
+        int a = heap.pop(weightArr);   //smallest
+        int b = heap.pop(weightArr);   //next smallest
+        if (nextFree >= MAX_NODES) {
+            cout << "too many nodes";
+            return 0;
+        }
+        nextFree++;
+        int parent = nextFree;
+        weightArr[parent] = weightArr[a] + weightArr[b];
+        leftArr[parent]   = a;
+        rightArr[parent]  = b;
+        charArr[parent]   = '\0';       //I looked this part up
+        heap.push(parent, weightArr);
+    }
+    int root = heap.pop(weightArr);
+    return root;
     return -1; // placeholder
 }
 
 // Step 4: Use an STL stack to generate codes
 void generateCodes(int root, string codes[]) {
-    // TODO:
-    // Use stack<pair<int, string>> to simulate DFS traversal.
-    // Left edge adds '0', right edge adds '1'.
-    // Record code when a leaf node is reached.
+    for (int i = 0; i < 26; ++i) codes[i].clear();
+    if (root < 0) return;
+    if (leftArr[root] == -1 && rightArr[root] == -1) {
+        unsigned char ch = static_cast<unsigned char>(charArr[root]);
+        if (ch >= 'a' && ch <= 'z') codes[ch - 'a'] = "0";
+        return;
+    }
+    stack<pair<int,string>> st;
+    st.push({root, ""});
+
+    while (!st.empty()) {
+        auto [node, code] = st.top();
+        st.pop();
+
+        int L = leftArr[node];
+        int R = rightArr[node];
+        bool isLeaf = (L == -1 && R == -1);
+
+        if (isLeaf) {
+            unsigned char ch = static_cast<unsigned char>(charArr[node]);
+            if (ch >= 'a' && ch <= 'z') {
+                // if code is empty (shouldn’t happen except single-node), map to "0"
+                codes[ch - 'a'] = code.empty() ? "0" : code;
+            }
+        } else {
+            // Push right first so left is processed first (LIFO stack).
+            if (R != -1) st.push({R, code + '1'});
+            if (L != -1) st.push({L, code + '0'});
+        }
+    }
 }
+
 
 // Step 5: Print table and encoded message
 void encodeMessage(const string& filename, string codes[]) {
