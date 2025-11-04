@@ -110,12 +110,13 @@ int buildEncodingTree(int nextFree) {
             cout << "too many nodes";
             return 0;
         }
+        //I looked up this next part
         nextFree++;
         int parent = nextFree;
         weightArr[parent] = weightArr[a] + weightArr[b];
         leftArr[parent]   = a;
         rightArr[parent]  = b;
-        charArr[parent]   = '\0';       //I looked up this part
+        charArr[parent]   = '\0';
         heap.push(parent, weightArr);
     }
     int root = heap.pop(weightArr);
@@ -144,7 +145,7 @@ void generateCodes(int root, string codes[]) {
         bool isLeaf = (Left == -1 && Right == -1);
 
         if (isLeaf) {
-            unsigned char ch = static_cast<unsigned char>(charArr[node]);
+            char ch = static_cast<unsigned char>(charArr[node]);    //I looked up this line
             if (ch >= 'a' && ch <= 'z') {
                 codes[ch - 'a'] = code.empty() ? "0" : code;
             }
