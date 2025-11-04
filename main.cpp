@@ -26,7 +26,9 @@ int main() {
     int freq[26] = {0};
 
     // Step 1: Read file and count letter frequencies
-    buildFrequencyTable(freq, "input.txt");
+
+    //Without the full file path it would not read properly
+    buildFrequencyTable(freq, "C:/Users/Elgato/Desktop/CLion Projects/Projects/fa25PA2/input.txt");
 
     // Step 2: Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
@@ -52,7 +54,7 @@ int main() {
 void buildFrequencyTable(int freq[], const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
-        cerr << "Error: could not open " << filename << "\n";
+        cout<< "Error: could not open " << filename << "\n";
         exit(1);
     }
 
@@ -83,7 +85,7 @@ int createLeafNodes(int freq[]) {
             nextFree++;
         }
     }
-    cout << "Created " << nextFree << " leaf nodes.\n";
+    cout << "Created " << nextFree << " leaf nodes." << endl;
     return nextFree;
 }
 
@@ -113,12 +115,12 @@ int buildEncodingTree(int nextFree) {
         weightArr[parent] = weightArr[a] + weightArr[b];
         leftArr[parent]   = a;
         rightArr[parent]  = b;
-        charArr[parent]   = '\0';       //I looked this part up
+        charArr[parent]   = '\0';       //I looked up this part
         heap.push(parent, weightArr);
     }
     int root = heap.pop(weightArr);
     return root;
-    return -1; // placeholder
+    return -1; //placeholder
 }
 
 // Step 4: Use an STL stack to generate codes
@@ -137,20 +139,18 @@ void generateCodes(int root, string codes[]) {
         auto [node, code] = st.top();
         st.pop();
 
-        int L = leftArr[node];
-        int R = rightArr[node];
-        bool isLeaf = (L == -1 && R == -1);
+        int Left = leftArr[node];
+        int Right = rightArr[node];
+        bool isLeaf = (Left == -1 && Right == -1);
 
         if (isLeaf) {
             unsigned char ch = static_cast<unsigned char>(charArr[node]);
             if (ch >= 'a' && ch <= 'z') {
-                // if code is empty (shouldn’t happen except single-node), map to "0"
                 codes[ch - 'a'] = code.empty() ? "0" : code;
             }
         } else {
-            // Push right first so left is processed first (LIFO stack).
-            if (R != -1) st.push({R, code + '1'});
-            if (L != -1) st.push({L, code + '0'});
+            if (Right != -1) st.push({Right, code + '1'});
+            if (Left != -1) st.push({Left, code + '0'});
         }
     }
 }
@@ -158,13 +158,13 @@ void generateCodes(int root, string codes[]) {
 
 // Step 5: Print table and encoded message
 void encodeMessage(const string& filename, string codes[]) {
-    cout << "\nCharacter : Code\n";
+    cout << endl << "Character : Code " <<endl;
     for (int i = 0; i < 26; ++i) {
         if (!codes[i].empty())
-            cout << char('a' + i) << " : " << codes[i] << "\n";
+            cout << char('a' + i) << " : " << codes[i] << endl;
     }
 
-    cout << "\nEncoded message:\n";
+    cout << endl <<"Encoded message:" << endl;
 
     ifstream file(filename);
     char ch;
@@ -174,6 +174,6 @@ void encodeMessage(const string& filename, string codes[]) {
         if (ch >= 'a' && ch <= 'z')
             cout << codes[ch - 'a'];
     }
-    cout << "\n";
+    cout << endl;
     file.close();
 }
